@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--原生方式进行开发nameSpace为当前包位置+配置文件名-->
+<mapper namespace="resources.userMapper">
+    <select id="selectOneUser" resultType="String" parameterType="int">
+    select pname from user where pid=#{pid}            /*如果传入的为基本数据类型的参数这里使用*/
+    </select>
+    <select id="getInUser" parameterType="int" resultType="domain.User">
+        select * from user where pid=#{pid}   /*sql语句后面不能跟;*/
+    </select>
+
+    <insert id="insertUser" parameterType="domain.User">
+        insert into user (pname,page,sex)values(#{pname},#{page},#{sex})
+    </insert>
+
+    <update id="updateUser" parameterType="domain.User">   /*注意update语句的特殊性只能传入对象值*/
+        update user set pname=#{pname},page=#{page},sex=#{sex} where pid=#{pid}
+    </update>
+
+    <delete id="deleteUser" parameterType="domain.User">
+        delete from user where pid=#{pid}
+    </delete>
+</mapper>
