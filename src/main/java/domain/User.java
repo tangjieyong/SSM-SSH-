@@ -5,6 +5,34 @@ public class User {
     private String pname;
     private Integer page;
     private Character sex;
+    private String email;
+    private City city;
+
+    public City getCity() {
+        return city;
+    }
+
+    public User(Integer pid, String pname, Integer page, Character sex, String email, City city) {
+        this.pid = pid;
+        this.pname = pname;
+        this.page = page;
+        this.sex = sex;
+        this.email = email;
+        this.city = city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 
     public User(Integer pid, String pname, Integer page, Character sex) {
         this.pid = pid;
@@ -61,6 +89,8 @@ public class User {
                 ", pname='" + pname + '\'' +
                 ", page=" + page +
                 ", sex=" + sex +
+                ", email='" + email + '\'' +
+                ", city=" + city +
                 '}';
     }
 }

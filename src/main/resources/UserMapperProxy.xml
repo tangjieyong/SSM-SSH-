@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.User">
+   <select id="getUser" parameterType="int" resultType="_user">
+       select  * from user where pid =#{pid}
+   </select>    <!--使用mapper代理开发
+               namespace要写成接口的路径
+                id要写成接口中对应的方法  参数类型和返回值类型要与接口中定义的一致
+       -->
+    <!--(非自增主键)在insert语句中可以使用<selectKey>来进行主键返回-->
+    <insert id="insertReturnPrimaryKey" parameterType="domain.User" >
+--   将查询到的主键封装到对象中
+        <selectKey keyColumn="pid" keyProperty="pid" order="AFTER" resultType="int">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into user (pname,page,sex) values(#{pname},#{page},#{sex})
+    </insert>
+
+    <!--自增主键也可以使用useGeneratedKeys="true"来进行返回-->
+    <insert id="insertUseGeneratedKeys" useGeneratedKeys="true" keyProperty="pid">
+        insert into user (page,pname,sex) values (#{page},#{pname},#{sex})
+    </insert>
+
+    <!--    domain.User getUserByNameAndAge(String name,int age);-->
+    <!--参数类型可以省略不写-->
+    <select id="getUserByNameAndAge" resultType="domain.User">
+    /*传递多参数Mybatis内部使用map进行封装,可以使用#{param1},#{param1}来在sql中取出参数值*/
+        select pid,pname,page,sex from user where pname=#{param1} and page=#{param2}
+    </select>
+    <!--/*传递多参数可以在接口中使用@Param()命名参数，在sql中使用#{参数的命名} 取出参数值*/-->
+    <select id="getUserByNamedParameter" resultType="domain.User">
+        select pid,pname,page,sex from user where pname=#{pname} and page=#{page}
+    </select>
+    <!--/*传递多参数可以在接口的方法内定义map，实现中为map赋值sql语句中使用赋值的key值取出参数值*/-->
+    <select id="getUserByMap" resultType="domain.User">
+     select pid,pname,page,sex from user where pname=#{pname} and page=#{page}
+    </select>
+   <!--传递的多参数如果是List，要用 #{list[0]}格式取出第一项-->
+    <select id="getUserByList" resultType="domain.User">
+      select pid,pname,page,sex from user where pname=#{list[0]} and page=#{list[1]}
+    </select>
+    <!--传递的多参数如果是数组，要用 #{array[0]}格式取出第一项-->
+    <select id="getUserByArray" resultType="domain.User">
+      select pid,pname,page,sex from user where pname=#{array[0]} and page=#{array[1]}
+    </select>
+
+<!--=============================================================================================================-->
+
+    <!--将返回字段封装成List，resultType值依然写成List的泛型-->
+    <select id="getUsersPottingInList" resultType="domain.User">
+        select * from user where sex like #{sex}
+    </select>
+
+    <!--查找一条记录封装在map，这种做法意义不大-->
+    <select id="getUserPottingInMap" resultType="map">
+      select pid,pname,page,sex from user where pid=#{pid}
+    </select>
+
+    <!--查找多条记录封装到map中要在接口的方法上使用注解@Keymap()来指定返回的某个字段成为map的key属性-->
+    <select id="getUsersPottingInMap" resultType="domain.User">
+        select pid,pname,page,sex from user where sex like #{sex}
+    </select>
+
+    <select id="getUserByResultMap" resultMap="getUser1">
+     select u.pname,u.page,u.pid,u.sex,c.city_id,c.city_name from user u, city c
+     where u.city_id=c.city_id and u.pid=#{pid}
+    </select>
+
+   <!--resultMap的功能在于自定义sql查询字段和与bean中属性的映射关系-->
+    <resultMap id="getUser1" type="domain.User">
+        <id column="pid" property="pid"/>
+        <result column="pname" property="pname"/>
+        <result column="page" property="page"/>
+        <result column="sex" property="sex"/>
+        <!--级联添加的方式为bean中属性的属性赋值-->
+        <!-- <result column="city_id" property="city.cityId"/>
+        <result column="city_name" property="city.cityName"/>-->
+
+        <!--使用嵌套的方式-->
+        <association property="city" javaType="domain.City">
+            <result column="city_id" property="cityId"/>
+            <result column="city_name" property="cityName"/>
+        </association>
+    </resultMap>
+
+    <!--association分段查询-->
+    <!--当前的查询逻辑需要调用其他mapper.xml中的语句-->
+
+    <select id="getUserByStep" resultMap="stepResultMap">
+        select pid,page,sex,pname,city_id from user where pid=#{pid}
+    </select>
+        <resultMap id="stepResultMap" type="domain.User">
+            <result column="pid" property="pid"/>
+            <result column="page" property="page"/>
+            <result column="sex" property="sex"/>
+            <result column="pname" property="pname"/>
+           <!--将数据库中查到的city_id字段传给dao.cityMapper.getCityIdByCityId这个方法，
+           并用这个方法的返回值为当前javabean的对应属性赋值-->
+
+            <!--select后面所接的方法对应的xml文件要先注册
+            并且要有对应的接口-->
+            <association property="city" select="dao.cityMapper.getCityIdByCityId" column="city_id" >
+
+            </association>
+        </resultMap>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

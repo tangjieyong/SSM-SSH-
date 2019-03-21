@@ -23,5 +23,8 @@
     <mappers><!--若mapper.xml文件和config在同一个目录下就直接写
               若不在同一个目录下就相对于src写路径-->
         <mapper resource="userMapper.xml"/>
+        <mapper resource="userMapperProxy.xml"/>
+        <mapper class="dao.Anotation"/>
+        <mapper resource="test.xml"/>
     </mappers>
 </configuration>

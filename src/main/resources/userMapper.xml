@@ -22,4 +22,6 @@
     <delete id="deleteUser" parameterType="domain.User">
         delete from user where pid=#{pid}
     </delete>
+
+
 </mapper>
